@@ -18,6 +18,42 @@ def cadastrarTipo():
     
     print("Cadastro concluído!")
 
+def editarTipo():
+    
+    # Usuário informa o valor de cada atributo.
+    print("Atualize um tipo de doce: ")
+    cont = 1
+    while(cont != 0):
+        print("0 - sair;")
+        print("1 - classificação;")
+        print("2 - sabor;")
+        print("3 - tipoPreço;")
+        print("4 - preco;")
+        print("5 - disponivel.")
+        op = int(input("O que deseja alterar? "))
+
+        if (op == 1):
+            classificacao = input("Informe a classificação do doce: ")
+            tipoCad = TipoDoce.update(classificacao=classificacao)
+        elif(op == 2):
+            sabor = input("Informe o sabor: ")
+            tipoCad = TipoDoce.update(sabor=sabor)
+        elif(op == 3):
+            tipoPreco = bool(input("O doce será pago por peso em Kg(False) ou por unidade(True)? "))
+            tipoCad = TipoDoce.update(tipoPreco=tipoPreco)
+        elif(op == 4):
+            preco = float(input("Informe o preço do doce: "))
+            tipoCad = TipoDoce.update(preco=preco)
+        elif(op == 5):
+            disponivel = bool(input("Informe se o doce está disponível(True) ou não(False): "))
+            tipoCad = TipoDoce.update(disponivel=disponivel)
+        else:
+            print("Opção inválida!")
+
+        cont = int(input("Deseja alterar outro atributo? 0 para 'não', 1 para 'sim'."))
+    
+    print("Atualização concluído!")
+
 def mostrarTipos():
     print("\n--------------------Tipos de Doces Cadastrados---------------------\n")
 
@@ -72,8 +108,7 @@ def menuOps2(op):
                 print("Incluir 'excluirTipo()'")
                 #excluirTipo()
             elif(op2 == 4):
-                print("Incluir 'editarTipo()'")
-                #editarTipo()
+                editarTipo()
             else:
                 print("Opção inválida!")
         else:
