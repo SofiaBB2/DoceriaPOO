@@ -82,6 +82,20 @@ def excluirTipo():
     tipoEx.delete_instance()
     print(f"Tipo de Doce removido do banco de dados")
 
+def cadastrarDoce():
+    op = 1
+    while(op != 0):
+        # Usuário informa o valor de cada atributo.
+        print("Cadastre um doce vendido: ")
+        peso = float(input("Informe o preço do doce: "))
+        idTipo = int(input("Informe o ID do tipo de doce que pertence: "))
+
+        # Cadastra o objeto no BD
+        doceCad = Doce.create(peso=peso, tipo=idTipo)
+        op = int(input("Deseja cadastrar outro doce vendido (0 ou 1)? "))
+    
+    print("Cadastro concluído!")
+
 def mostrarDoces():
     print("\n-----------------Doces Vendidos----------------------\n")
     doces = Doce.select()
@@ -124,8 +138,7 @@ def menuOps2(op):
                 print("Opção inválida!")
         else:
             if(op2 == 1):
-                print("Incluir cadastrarDoce()")
-                #cadastrarDoce()
+                cadastrarDoce()
             elif(op2 == 2):
                 mostrarDoces()
             elif(op2 == 4):
