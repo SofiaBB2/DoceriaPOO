@@ -90,6 +90,7 @@ def mostrarDoces():
         print("\n---------------------------------------------------------\n")
 
 def menuOps2(op):
+    op2 = -1
     while(op2 != 0):
         print("\n-----------------MENU DE OPERAÇÕES------------------\n")
         print("0 - cancelar;")
