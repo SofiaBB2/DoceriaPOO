@@ -2,8 +2,8 @@ from models import TipoDoce, Doce
 
 
 def cadastrarTipo():
-    op = True
-    while(op):
+    op = 1
+    while(op != 0):
         # Usuário informa o valor de cada atributo.
         print("Cadastre um tipo de doce: ")
         classificacao = input("Informe a classificação do doce: ")
@@ -14,14 +14,17 @@ def cadastrarTipo():
 
         # Cadastra o objeto no BD
         tipoCad = TipoDoce.create(classificacao=classificacao, sabor=sabor, tipoPreco=tipoPreco, preco=preco, disponivel=disponivel)
-        op = bool(input("Deseja cadastrar outro tipo de doce?\n"))
+        op = int(input("Deseja cadastrar outro tipo de doce (0 ou 1)? "))
     
     print("Cadastro concluído!")
 
 def editarTipo():
-    
+    # Mostra os Tipos de Doces cadastrados para que usuário saiba esccolher o ID correto.
+    mostrarTipos()
     # Usuário informa o valor de cada atributo.
-    print("Atualize um tipo de doce: ")
+    idAt = int(input("Qual é o ID do tipo de doce que deseja atualizar? "))
+    tipoAt = TipoDoce.get(TipoDoce.id == idAt)
+
     cont = 1
     while(cont != 0):
         print("0 - sair;")
@@ -33,33 +36,33 @@ def editarTipo():
         op = int(input("O que deseja alterar? "))
 
         if (op == 1):
-            classificacao = input("Informe a classificação do doce: ")
-            tipoCad = TipoDoce.update(classificacao=classificacao)
+            tipoAt.classificacao = input("Informe a classificação do doce: ")
+            tipoAt.save()
         elif(op == 2):
-            sabor = input("Informe o sabor: ")
-            tipoCad = TipoDoce.update(sabor=sabor)
+            tipoAt.sabor = input("Informe o sabor: ")
+            tipoAt.save()
         elif(op == 3):
-            tipoPreco = bool(input("O doce será pago por peso em Kg(False) ou por unidade(True)? "))
-            tipoCad = TipoDoce.update(tipoPreco=tipoPreco)
+            tipoAt.tipoPreco = bool(input("O doce será pago por peso em Kg(False) ou por unidade(True)? "))
+            tipoAt.save()
         elif(op == 4):
-            preco = float(input("Informe o preço do doce: "))
-            tipoCad = TipoDoce.update(preco=preco)
+            tipoAt.preco = float(input("Informe o preço do doce: "))
+            tipoAt.save()
         elif(op == 5):
-            disponivel = bool(input("Informe se o doce está disponível(True) ou não(False): "))
-            tipoCad = TipoDoce.update(disponivel=disponivel)
+            tipoAt.disponivel = bool(input("Informe se o doce está disponível(True) ou não(False): "))
+            tipoAt.save()
         else:
             print("Opção inválida!")
 
         cont = int(input("Deseja alterar outro atributo? 0 para 'não', 1 para 'sim'."))
     
-    print("Atualização concluído!")
+    print("Atualização concluída!")
 
 def mostrarTipos():
     print("\n--------------------Tipos de Doces Cadastrados---------------------\n")
 
     tiposCad = TipoDoce.select()
     for doce in tiposCad:
-        print(f"Classificação: {doce.classificacao}")
+        print(f"Classificação: {doce.classificacao} (ID: {doce.id})")
         print(f"Sabor: {doce.sabor}")
         if doce.tipoPreco:
             print(f"O preço do doce por unidade é R${doce.preco}")
@@ -70,7 +73,15 @@ def mostrarTipos():
         else: 
             print(f"O doce não está disponível.")
         print("\n---------------------------------------------------------\n")
-    
+
+def excluirTipo():
+    # Mostra os Tipos de Doces cadastrados para que usuário saiba esccolher o ID correto.
+    mostrarTipos()
+    idExcluir = int(input("\nQual é o ID do tipo de doce que deseja excluir? "))
+    tipoEx = TipoDoce.get(TipoDoce.id == idExcluir)
+    tipoEx.delete_instance()
+    print(f"Tipo de Doce removido do banco de dados")
+
 def mostrarDoces():
     print("\n-----------------Doces Vendidos----------------------\n")
     doces = Doce.select()
@@ -98,7 +109,7 @@ def menuOps2(op):
         print("2 - mostrar;")
         print("3 - excluir;")
         print("4 - editar.")
-        op2 = int(input("\nQual é a opção escolhida?\n" ))
+        op2 = int(input("\nQual é a opção escolhida? " ))
 
         if(op == 1):
             if(op2 == 1):
@@ -106,8 +117,7 @@ def menuOps2(op):
             elif(op2 == 2):
                 mostrarTipos()
             elif(op2 == 3):
-                print("Incluir 'excluirTipo()'")
-                #excluirTipo()
+                excluirTipo()
             elif(op2 == 4):
                 editarTipo()
             else:
