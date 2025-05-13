@@ -87,6 +87,7 @@ def cadastrarDoce():
     while(op != 0):
         # Usuário informa o valor de cada atributo.
         print("Cadastre um doce vendido: ")
+    
         peso = float(input("Informe o peso do doce: "))
         idTipo = int(input("Informe o ID do tipo de doce que pertence: "))
 
@@ -101,21 +102,32 @@ def mostrarDoces():
     doces = Doce.select()
 
     for doce in doces:
+        print(f"(ID: {doce.id})")
         print(f"Peso: {doce.peso}g")
-        print(f"Tipo de Doce: {doce.tipo.classificacao}")
-        print(f"Sabor: {doce.tipo.sabor}")
-        if doce.tipo.tipoPreco:
-            print(f"O preço do doce por unidade é R${doce.tipo.preco}")
-        else:
-            print(f"O preço do doce por kg é R${doce.tipo.preco}")
-        if doce.tipo.disponivel:
-            print(f"O doce está disponível.")
-        else: 
-            print(f"O doce não está disponível.")
-        print("\n---------------------------------------------------------\n")
+        
+        try:
+            print(f"Tipo de Doce: {doce.tipo.classificacao}")
+            print(f"Sabor: {doce.tipo.sabor}")
+            if doce.tipo.tipoPreco:
+                print(f"O preço do doce por unidade é R${doce.tipo.preco}")
+            else:
+                print(f"O preço do doce por kg é R${doce.tipo.preco}")
+            if doce.tipo.disponivel:
+                print(f"O doce está disponível.")
+            else: 
+                print(f"O doce não está disponível.")
+            print("\n---------------------------------------------------------\n")
+        except:
+            print("O Tipo desse Doce foi excluído!")
 
 def excluirDoce():
-    print("Algo")
+    # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
+    mostrarDoces()
+
+    idExcluir = int(input("\nQual é o ID do doce que deseja excluir? "))
+    doceEx = Doce.get(Doce.id == idExcluir)
+    doceEx.delete_instance()
+    print(f"Doce removido do banco de dados.")
 
 def editarDoce():
     # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
@@ -173,8 +185,7 @@ def menuOps2(op):
             elif(op2 == 2):
                 mostrarDoces()
             elif(op2 == 3):
-                print("Incluir excluirDoce()")
-               # excluirDoce()
+                excluirDoce()
             elif(op2 == 4):
                 editarDoce()
             else:

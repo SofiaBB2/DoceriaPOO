@@ -28,8 +28,9 @@ class TipoDoce(BaseModel):
 """
 class Doce(BaseModel):
     peso = DoubleField()
-    tipo = ForeignKeyField(TipoDoce)
+    tipo = ForeignKeyField(TipoDoce, backref='doces', null=True, on_delete='SET NULL')
 
 # Criar todas as classes e depois conectar BD e criar tabelas
 meu_bd.connect()
+meu_bd.execute_sql('PRAGMA foreign_keys = ON;')
 meu_bd.create_tables([Doce, TipoDoce])
