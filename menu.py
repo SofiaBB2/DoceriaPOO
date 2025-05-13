@@ -25,8 +25,8 @@ def editarTipo():
     idAt = int(input("Qual é o ID do tipo de doce que deseja atualizar? "))
     tipoAt = TipoDoce.get(TipoDoce.id == idAt)
 
-    cont = 1
-    while(cont != 0):
+    op = -1
+    while(op != 0):
         print("0 - sair;")
         print("1 - classificação;")
         print("2 - sabor;")
@@ -35,7 +35,9 @@ def editarTipo():
         print("5 - disponivel.")
         op = int(input("O que deseja alterar? "))
 
-        if (op == 1):
+        if(op == 0):
+            break
+        elif (op == 1):
             tipoAt.classificacao = input("Informe a classificação do doce: ")
             tipoAt.save()
         elif(op == 2):
@@ -52,9 +54,7 @@ def editarTipo():
             tipoAt.save()
         else:
             print("Opção inválida!")
-
-        cont = int(input("Deseja alterar outro atributo? 0 para 'não', 1 para 'sim'."))
-    
+     
     print("Atualização concluída!")
 
 def mostrarTipos():
@@ -87,7 +87,7 @@ def cadastrarDoce():
     while(op != 0):
         # Usuário informa o valor de cada atributo.
         print("Cadastre um doce vendido: ")
-        peso = float(input("Informe o preço do doce: "))
+        peso = float(input("Informe o peso do doce: "))
         idTipo = int(input("Informe o ID do tipo de doce que pertence: "))
 
         # Cadastra o objeto no BD
@@ -101,10 +101,10 @@ def mostrarDoces():
     doces = Doce.select()
 
     for doce in doces:
-        print(f"Peso: {doce.peso}")
+        print(f"Peso: {doce.peso}g")
         print(f"Tipo de Doce: {doce.tipo.classificacao}")
         print(f"Sabor: {doce.tipo.sabor}")
-        if doce.tipoPreco:
+        if doce.tipo.tipoPreco:
             print(f"O preço do doce por unidade é R${doce.tipo.preco}")
         else:
             print(f"O preço do doce por kg é R${doce.tipo.preco}")
@@ -113,6 +113,37 @@ def mostrarDoces():
         else: 
             print(f"O doce não está disponível.")
         print("\n---------------------------------------------------------\n")
+
+def excluirDoce():
+    print("Algo")
+
+def editarDoce():
+    # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
+    mostrarDoces()
+
+    idAt = int(input("Informe o ID do doce que deseja alterar: "))
+    doceAt = Doce.get(Doce.id == idAt)
+    
+    op = -1
+    while(op != 0):
+        print("0 - sair;")
+        print("1 - peso;")
+        print("2 - tipo;")
+        op = int(input("O que deseja alterar? "))
+
+        if(op == 0):
+            break
+        elif(op == 1):
+            doceAt.peso = input("Informe o novo peso do doce: ")
+            doceAt.save()
+        elif(op == 2):
+            mostrarTipos()
+            idTipo = int(input("Informe o ID do tipo de doce que pertence: "))
+            doceAt.save
+        else:
+            print("Opção inválida!")
+     
+    print("Atualização concluída!")
 
 def menuOps2(op):
     op2 = -1
@@ -141,9 +172,11 @@ def menuOps2(op):
                 cadastrarDoce()
             elif(op2 == 2):
                 mostrarDoces()
+            elif(op2 == 3):
+                print("Incluir excluirDoce()")
+               # excluirDoce()
             elif(op2 == 4):
-                print("Incluir editarDoce()")
-                #editarDoce()
+                editarDoce()
             else:
                 print("Opção inválida!")
 
