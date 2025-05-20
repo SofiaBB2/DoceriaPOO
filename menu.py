@@ -144,6 +144,7 @@ def mostrarDoces():
         # Caso não encontre aquele ID de Tipo de Doce, avisa que foi exluído.
         except:
             print("O Tipo desse Doce foi excluído!")
+            print("\n---------------------------------------------------------\n")
 
 def excluirDoce():
     # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
