@@ -8,23 +8,39 @@ def cadastrarTipo():
         print("Cadastre um tipo de doce: ")
         classificacao = input("Informe a classificação do doce: ")
         sabor = input("Informe o sabor: ")
-        tipoPreco = bool(input("O doce será pago por peso em Kg(False) ou por unidade(True)? "))
+        tipoPreco = None
+        while(tipoPreco == None):
+            tipoPreco = input("O doce será pago por peso Kg ou por unidade? (Responder (Kg) ou (unidade)). ")
+            if (tipoPreco.casefold() == "unidade".casefold()):
+                tipoPreco = True
+            elif(tipoPreco.casefold() == "Kg".casefold()):
+                tipoPreco = False
+            else:
+                print("Erro! Valor inválido.")
         preco = float(input("Informe o preço do doce: "))
-        disponivel = bool(input("Informe se o doce está disponível(True) ou não(False): "))
+        disponivel = input("O doce está disponível? ")
+        if (disponivel.casefold() == "sim".casefold()):
+            disponivel = True
+        else:
+            disponivel = False
 
-        # Cadastra o objeto no BD
+        # Cadastra o objeto no BD.
         tipoCad = TipoDoce.create(classificacao=classificacao, sabor=sabor, tipoPreco=tipoPreco, preco=preco, disponivel=disponivel)
+        # Verifica se o usuário quer cadastrar mais tipos de doces.
         op = int(input("Deseja cadastrar outro tipo de doce (0 ou 1)? "))
     
     print("Cadastro concluído!")
 
 def editarTipo():
-    # Mostra os Tipos de Doces cadastrados para que usuário saiba esccolher o ID correto.
+    
+    # Mostra os Tipos de Doces cadastrados para que usuário saiba escolher o ID correto.
     mostrarTipos()
-    # Usuário informa o valor de cada atributo.
+    
+    # Usuário informa o ID a ser atualizado.
     idAt = int(input("Qual é o ID do tipo de doce que deseja atualizar? "))
     tipoAt = TipoDoce.get(TipoDoce.id == idAt)
 
+    # Usuário informa qual atributo deseja atualizar e qual é o novo valor.
     op = -1
     while(op != 0):
         print("0 - sair;")
@@ -59,8 +75,10 @@ def editarTipo():
 
 def mostrarTipos():
     print("\n--------------------Tipos de Doces Cadastrados---------------------\n")
-
+    
+    # Seleciona a lista de tipos de doces.
     tiposCad = TipoDoce.select()
+    # Mostra todos os atributos de cada tipo de doce.
     for doce in tiposCad:
         print(f"Classificação: {doce.classificacao} (ID: {doce.id})")
         print(f"Sabor: {doce.sabor}")
@@ -75,9 +93,11 @@ def mostrarTipos():
         print("\n---------------------------------------------------------\n")
 
 def excluirTipo():
-    # Mostra os Tipos de Doces cadastrados para que usuário saiba esccolher o ID correto.
+    # Mostra os Tipos de Doces cadastrados para que usuário saiba escolher o ID correto.
     mostrarTipos()
+    # Usuário informa qual atributo deseja excluir.
     idExcluir = int(input("\nQual é o ID do tipo de doce que deseja excluir? "))
+    # Seleciona o tipo de doce do ID informado pelo usuário e exclui do BD.
     tipoEx = TipoDoce.get(TipoDoce.id == idExcluir)
     tipoEx.delete_instance()
     print(f"Tipo de Doce removido do banco de dados")
@@ -89,22 +109,26 @@ def cadastrarDoce():
         print("Cadastre um doce vendido: ")
     
         peso = float(input("Informe o peso do doce: "))
+        # Mostra os Tipos de Doces cadastrados para que usuário saiba escolher o ID correto.
+        mostrarTipos()
         idTipo = int(input("Informe o ID do tipo de doce que pertence: "))
 
         # Cadastra o objeto no BD
         doceCad = Doce.create(peso=peso, tipo=idTipo)
+        # Verifica se o usuário quer cadastrar mais doces vendidos.
         op = int(input("Deseja cadastrar outro doce vendido (0 ou 1)? "))
     
     print("Cadastro concluído!")
 
 def mostrarDoces():
     print("\n-----------------Doces Vendidos----------------------\n")
+    # Seleciona a lista de doces.
     doces = Doce.select()
-
+    # Mostra todos os atributos de cada doce.
     for doce in doces:
         print(f"(ID: {doce.id})")
         print(f"Peso: {doce.peso}g")
-        
+        # Tenta mostrar os atributos do Tipo de Doce relacionado àquele doce.
         try:
             print(f"Tipo de Doce: {doce.tipo.classificacao}")
             print(f"Sabor: {doce.tipo.sabor}")
@@ -117,6 +141,7 @@ def mostrarDoces():
             else: 
                 print(f"O doce não está disponível.")
             print("\n---------------------------------------------------------\n")
+        # Caso não encontre aquele ID de Tipo de Doce, avisa que foi exluído.
         except:
             print("O Tipo desse Doce foi excluído!")
 
@@ -124,7 +149,9 @@ def excluirDoce():
     # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
     mostrarDoces()
 
+    # Usuário informa o ID a ser excluído.
     idExcluir = int(input("\nQual é o ID do doce que deseja excluir? "))
+    # Seleciona o doce do ID informado pelo usuário e exclui do BD.
     doceEx = Doce.get(Doce.id == idExcluir)
     doceEx.delete_instance()
     print(f"Doce removido do banco de dados.")
@@ -133,9 +160,11 @@ def editarDoce():
     # Mostra os Doces cadastrados para que usuário saiba esccolher o ID correto.
     mostrarDoces()
 
+    # Usuário informa o ID a ser atualizado.
     idAt = int(input("Informe o ID do doce que deseja alterar: "))
     doceAt = Doce.get(Doce.id == idAt)
-    
+
+    # Usuário informa qual atributo deseja atualizar e qual é o novo valor.
     op = -1
     while(op != 0):
         print("0 - sair;")
@@ -159,6 +188,7 @@ def editarDoce():
 
 def menuOps2(op):
     op2 = -1
+    # Exibe o Menu de Operações enquanto o usuário quiser continuar.
     while(op2 != 0):
         print("\n-----------------MENU DE OPERAÇÕES------------------\n")
         print("0 - cancelar;")
@@ -196,9 +226,9 @@ def menuOps():
     op = -1
     print("Seja bem-vindo(a) à Doceria da Alegria!")
 
+    # Exibe o Menu Geral enquanto o usuário quiser continuar.
     while(op != 0):
         print("\n-----------------MENU GERAL------------------\n")
-
         print("0 - sair do programa;")
         print("1 - Tipos de Doces;")
         print("2 - Doces Vendidos.")
