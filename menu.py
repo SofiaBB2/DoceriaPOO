@@ -39,7 +39,7 @@ def editarTipo():
     # Usuário informa o ID a ser atualizado.
     idAt = int(input("Qual é o ID do tipo de doce que deseja atualizar? "))
     tipoAt = TipoDoce.get(TipoDoce.id == idAt)
-
+    print(tipoAt)
     # Usuário informa qual atributo deseja atualizar e qual é o novo valor.
     op = -1
     while(op != 0):
