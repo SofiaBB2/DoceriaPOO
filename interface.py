@@ -3,7 +3,6 @@ from models import TipoDoce
 from tkinter import messagebox as mb
 
 
-
 def atualizaListbox():
     tiposDeDocesCad.delete(0, tk.END)
 
@@ -36,9 +35,9 @@ def cadastrarTipo():
     sabor = saborEt.get()
 
     tipoPreco = tipoPrecoEt.get()
-    if (tipoPreco.casefold() == "unidade".casefold()):
+    if (tipoPreco.casefold() == "unidade"):
         tipoPreco = True
-    elif(tipoPreco.casefold() == "Kg".casefold()):
+    elif(tipoPreco.casefold() == "kg"):
         tipoPreco = False
     else:
         mb.showerror("Erro em Tipo de Preço", "Informe um valor válido! ('Kg' ou 'unidade')")
@@ -49,7 +48,7 @@ def cadastrarTipo():
         mb.showerror("Erro em Preço", "Informe um valor válido! (algum valor numérico)")
 
     disponivel = disponivelEt.get()
-    if (disponivel.casefold() == "sim".casefold()):
+    if (disponivel.casefold() == "sim"):
         disponivel = True
     else:
         disponivel = False
@@ -69,10 +68,8 @@ def pegarSelecao():
         texto = tiposDeDocesCad.get(indice)
         texto = texto.split("ID: ")
         idAt = texto[1].replace(")", "")
-        print(f"Selecionado: {texto}, Indice: {idAt}")
         return idAt
     else:
-        print("Nenhum item selecionado")
         return -1
 
 def editarTipo():
@@ -104,9 +101,9 @@ def pegaNovosVal(tipoAt):
     tipoAt.classificacao = classificacaoEt.get()
     tipoAt.sabor = saborEt.get()
     tipoPreco = tipoPrecoEt.get()
-    if (tipoPreco.casefold() == "unidade".casefold()):
+    if (tipoPreco.casefold() == "unidade".casefold() or tipoPreco == "1"):
         tipoAt.tipoPreco = True
-    elif(tipoPreco.casefold() == "Kg".casefold()):
+    elif(tipoPreco.casefold() == "Kg".casefold() or tipoPreco == "0"):
         tipoAt.tipoPreco = False
     else:
         mb.showerror("Erro em Tipo de Preço", "Informe um valor válido! ('Kg' ou 'unidade')")
@@ -116,7 +113,7 @@ def pegaNovosVal(tipoAt):
         mb.showerror("Erro em Preço", "Informe um valor válido! (algum valor numérico)")
 
     disponivel = disponivelEt.get()
-    if (disponivel.casefold() == "sim".casefold()):
+    if (disponivel.casefold() == "sim".casefold() or disponivel == 1):
         tipoAt.disponivel = True
     else:
         tipoAt.disponivel = False
@@ -137,7 +134,7 @@ def excluirTipo():
 
 
 janela = tk.Tk("Doceria POO")
-janela.geometry("700x700")
+janela.geometry("520x550")
 
 tituloLb = tk.Label(text="Cadastrar Tipo de Doce", font=("Times New Roman", 16,"bold"), justify="center")
 tituloLb.grid(padx=5, pady=7, column=0, row=0, columnspan=3)
