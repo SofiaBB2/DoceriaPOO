@@ -1,8 +1,9 @@
 import tkinter as tk
 from models import TipoDoce, Doce
 from tkinter import messagebox as mb
+from tkinter import ttk
 
-def atualizaListbox():
+def atualizaListboxTD():
     tiposDeDocesCad.delete(0, tk.END)
 
     tiposCad = TipoDoce.select()
@@ -20,12 +21,28 @@ def atualizaListbox():
             tiposDeDocesCad.insert(tk.END, f"O doce não está disponível. (ID: {doce.id})")
         tiposDeDocesCad.insert(tk.END, "\n--------------------------------------------------------------------------------------------------\n")
 
+def atualizaListboxD():
+    docesCad.delete(0, tk.END)
+    listbox_docesCad = Doce.select()
+    # Mostra todos os atributos de cada doce.
+    for doce in listbox_docesCad:
+        docesCad.insert(tk.END, f"Quantidade: {doce.peso} (ID: {doce.id})")
+        docesCad.insert(tk.END, f"ID de Tipo de Doce: {doce.tipo} (ID: {doce.id})")
+        docesCad.insert(tk.END, "\n--------------------------------------------------------------------------------------------------\n")
+
+def atualizaCombobox():
+    tipoLb = tk.Label(frame_doce, text="Tipo de Doce:", font=("Times New Roman", 14))
+    tipoLb.grid(padx=5, pady=7, column=0, row=2, sticky="w")
+    tipos = [f"{tipo.classificacao} de {tipo.sabor} ({tipo.id})" for tipo in TipoDoce.select()]
+    return tipos
+
 def limparCampos():
     classificacaoEt.delete(0, tk.END)
     saborEt.delete(0, tk.END)
     tipoPrecoEt.delete(0, tk.END)
     precoEt.delete(0, tk.END)
     disponivelEt.delete(0, tk.END)
+    quantidadeEt.delete(0, tk.END)
 
 def cadastrarTipo():
     classificacao = classificacaoEt.get()
@@ -55,22 +72,53 @@ def cadastrarTipo():
     tipoCad = TipoDoce.create(classificacao=classificacao, sabor=sabor, tipoPreco=tipoPreco, preco=preco, disponivel=disponivel)
 
     limparCampos()
-    atualizaListbox()
+    atualizaListboxTD()
 
     mb.showinfo("Cadastro concluído", "Cadastrado com sucesso!")
 
 def salvarDoce():
-    idAt = int(pegarSelecao())
-    tipoAt = TipoDoce.get(TipoDoce.id == idAt)
+    tipo_selecionado = combobox_tipo.get()
+    idAt = int(tipo_selecionado.split("(")[-1].strip(")"))
+    tipo = TipoDoce.get_by_id(idAt)        
     quantidade = quantidadeEt.get()
-    doceCad = Doce.create(tipo=tipoAt, peso=quantidade)
+    doceCad = Doce.create(tipo=tipo, peso=quantidade)
     limparCampos()
-    atualizaListbox()
+    mb.showinfo("Sucesso", f"Doce {doceCad.id} salvo com sucesso!")
+    atualizaListboxD()
 
-    mb.showinfo("Cadastro concluído", "Cadastrado com sucesso!")
+def editarDoce():
+    idAt = int(pegarSelecaoD())
+    doceAt = Doce.get(Doce.id == idAt)
     
+    quantidadeEt.delete(0, tk.END)
+    quantidadeEt.insert(0, doceAt.peso)
 
-def pegarSelecao():
+    global salvarBtDoce
+    salvarBtDoce.destroy()
+    salvarBtDoce = tk.Button(text="Alterar", font=("Times New Roman", 14), command=lambda: pegaNovosValD(doceAt))
+    salvarBtDoce.grid(padx=5, pady=7, column=2, row=3,  sticky="ew") 
+
+def pegaNovosValD(doceAt):
+    doceAt.peso = quantidadeEt.get()
+    tipo_selecionado = combobox_tipo.get()
+    idAt = int(tipo_selecionado.split("(")[-1].strip(")"))
+    doceAt.tipo = TipoDoce.get_by_id(idAt)
+    doceAt.save()
+    atualizaListboxD()
+    limparCampos()
+    global salvarBtDoce
+    salvarBtDoce.destroy()
+    salvarBtDoce = tk.Button(text="Salvar", font=("Times New Roman", 14), command=salvarDoce)
+    salvarBtDoce.grid(padx=5, pady=7, column=2, row=3,  sticky="ew")
+
+def excluirDoce():
+    idExcluir = pegarSelecaoD()
+    doceEx = Doce.get(Doce.id == idExcluir)
+    doceEx.delete_instance()
+    mb.showinfo("Excluído", "Doce removido do banco de dados")
+    atualizaListboxD()
+
+def pegarSelecaoTD():
     selecao = tiposDeDocesCad.curselection()
     if selecao: 
         indice = selecao[0]
@@ -81,8 +129,19 @@ def pegarSelecao():
     else:
         return -1
 
+def pegarSelecaoD():
+    selecao = docesCad.curselection()
+    if selecao: 
+        indice = selecao[0]
+        texto = docesCad.get(indice)
+        texto = texto.split("ID: ")
+        idAt = texto[1].replace(")", "")
+        return idAt
+    else:
+        return -1    
+
 def editarTipo():
-    idAt = int(pegarSelecao())
+    idAt = int(pegarSelecaoTD())
     tipoAt = TipoDoce.get(TipoDoce.id == idAt)
 
     classificacaoEt.delete(0, tk.END)
@@ -102,10 +161,10 @@ def editarTipo():
 
     global salvarBt
     salvarBt.destroy()
-    salvarBt = tk.Button(text="Alterar", font=("Times New Roman", 14), command=lambda: pegaNovosVal(tipoAt))
+    salvarBt = tk.Button(text="Alterar", font=("Times New Roman", 14), command=lambda: pegaNovosValTD(tipoAt))
     salvarBt.grid(padx=5, pady=7, column=2, row=6,  sticky="ew")   
 
-def pegaNovosVal(tipoAt):
+def pegaNovosValTD(tipoAt):
     tipoAt.classificacao = classificacaoEt.get()
     tipoAt.sabor = saborEt.get()
     tipoPreco = tipoPrecoEt.get()
@@ -126,19 +185,14 @@ def pegaNovosVal(tipoAt):
     else:
         tipoAt.disponivel = False
     tipoAt.save()
-    atualizaListbox()
-    limparCampos()
-    global salvarBt
-    salvarBt.destroy()
-    salvarBt = tk.Button(text="Salvar", font=("Times New Roman", 14), command=cadastrarTipo)
-    salvarBt.grid(padx=5, pady=7, column=2, row=6,  sticky="ew")
+    atualizaListboxTD()
     
 def excluirTipo():
-    idExcluir = pegarSelecao()
+    idExcluir = pegarSelecaoTD()
     tipoEx = TipoDoce.get(TipoDoce.id == idExcluir)
     tipoEx.delete_instance()
     mb.showinfo("Excluído", "Tipo de Doce removido do banco de dados")
-    atualizaListbox()
+    atualizaListboxTD()
 
 def pagina_inicio():
     frame_inicio.tkraise()
@@ -206,7 +260,7 @@ salvarBt.grid(padx=5, pady=7, column=2, row=6,  sticky="ew")
 
 tiposDeDocesCad = tk.Listbox(frame_tipo, width=30, height=10)
 tiposDeDocesCad.grid(padx=5, pady=7, column=0, row=7, columnspan=3, sticky="ew")
-atualizaListbox()
+atualizaListboxTD()
 
 editarBt = tk.Button(frame_tipo, text="Editar", font=("Times New Roman", 14), command=editarTipo)
 editarBt.grid(padx=5, pady=7, column=0, row=8,  sticky="ew")
@@ -227,18 +281,22 @@ quantidadeLb.grid(padx=5, pady=7, column=0, row=1, sticky="w")
 quantidadeEt = tk.Entry(frame_doce)
 quantidadeEt.grid(padx=5, pady=7, column=1, row=1, columnspan=2, sticky="ew")
 
+tipos = atualizaCombobox()
+combobox_tipo = ttk.Combobox(frame_doce, values=tipos)
+combobox_tipo.grid(padx=5, pady=7, column=1, row=2, sticky="ew")
+
 limparBt = tk.Button(frame_doce, text="Limpar", font=("Times New Roman", 14), command=limparCampos)
-limparBt.grid(padx=5, pady=7, column=1, row=6,  sticky="ew")
-salvarBt = tk.Button(frame_doce, text="Salvar", font=("Times New Roman", 14), command=salvarDoce)
-salvarBt.grid(padx=5, pady=7, column=2, row=6,  sticky="ew")
+limparBt.grid(padx=5, pady=7, column=1, row=3,  sticky="ew")
+salvarBtDoce = tk.Button(frame_doce, text="Salvar", font=("Times New Roman", 14), command=salvarDoce)
+salvarBtDoce.grid(padx=5, pady=7, column=2, row=3,  sticky="ew")
 
-tiposDeDocesCad = tk.Listbox(frame_doce, width=30, height=10)
-tiposDeDocesCad.grid(padx=5, pady=7, column=0, row=7, columnspan=3, sticky="ew")
-atualizaListbox()
+docesCad = tk.Listbox(frame_doce, width=30, height=10)
+docesCad.grid(padx=5, pady=7, column=0, row=4, columnspan=3, sticky="ew")
+atualizaListboxD()
 
-editarBt = tk.Button(frame_doce, text="Editar", font=("Times New Roman", 14), command=editarTipo)
+editarBt = tk.Button(frame_doce, text="Editar", font=("Times New Roman", 14), command=editarDoce)
 editarBt.grid(padx=5, pady=7, column=0, row=8,  sticky="ew")
-excluirBt = tk.Button(frame_doce, text="Excluir", font=("Times New Roman", 14), command=excluirTipo)
+excluirBt = tk.Button(frame_doce, text="Excluir", font=("Times New Roman", 14), command=excluirDoce)
 excluirBt.grid(padx=5, pady=7, column=1, row=8,  sticky="ew")
 
 # Inserindo Frames na janela
